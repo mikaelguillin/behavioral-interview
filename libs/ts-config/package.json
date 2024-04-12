@@ -1,0 +1,10 @@
+{
+    "name": "@behavioral-interview/ts-config",
+    "version": "1.0.0",
+    "description": "",
+    "files": [
+        "tsconfig.base.json",
+        "tsconfig.react.json",
+        "tsconfig.backend.json"
+    ]
+}

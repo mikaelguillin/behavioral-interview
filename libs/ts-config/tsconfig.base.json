@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
+    }
+}

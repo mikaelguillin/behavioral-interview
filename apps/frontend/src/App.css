@@ -1,0 +1,42 @@
+#root {
+    width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    width: 1000px;
+    gap: 20px;
+}
+
+.btn-recording svg {
+    color: red;
+    animation: showHideRecordingIcon 1.7s ease-in-out infinite;
+}
+
+.question-result + .question-result {
+    margin-top: 20px;
+}
+
+.record {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: center;
+}
+
+@keyframes showHideRecordingIcon {
+    0% {
+        opacity: 0; /* Element is hidden at the start */
+    }
+    50% {
+        opacity: 1; /* Element is fully visible halfway through */
+    }
+    100% {
+        opacity: 0; /* Element is hidden again at the end */
+    }
+}

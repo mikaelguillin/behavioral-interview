@@ -1,0 +1,16 @@
+{
+    "name": "behavioral-interview",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "pnpm --parallel --stream -r run dev",
+        "build": "pnpm --parallel --stream -r run build"
+    },
+    "author": "Mikael Guillin",
+    "devDependencies": {
+        "@behavioral-interview/eslint-config": "workspace:*",
+        "@behavioral-interview/ts-config": "workspace:*",
+        "@behavioral-interview/types": "workspace:*",
+        "typescript": "^5.2.2"
+    }
+}
