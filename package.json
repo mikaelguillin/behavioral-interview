@@ -7,6 +7,9 @@
         "build": "pnpm --parallel --stream -r run build"
     },
     "author": "Mikael Guillin",
+    "dependencies": {
+        "lodash": "^4.17.21"
+    },
     "devDependencies": {
         "@behavioral-interview/eslint-config": "workspace:*",
         "@behavioral-interview/ts-config": "workspace:*",

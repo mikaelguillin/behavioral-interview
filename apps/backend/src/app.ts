@@ -6,6 +6,7 @@ import multer from 'multer';
 
 import fs from 'fs';
 import cors from 'cors';
+import { Db, Document, MongoClient, ObjectId } from 'mongodb';
 
 dotenv.config();
 
@@ -19,6 +20,22 @@ app.use(bodyParser.json());
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
+
+const mongoString = process.env.DATABASE_URL || '';
+const client = new MongoClient(mongoString);
+let conn: MongoClient;
+let db: Db;
+
+async function connectDB() {
+    try {
+        conn = await client.connect();
+        db = conn.db('behavioral-interview');
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+connectDB();
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -72,48 +89,22 @@ async function analyzeSTAR(audio: Express.Multer.File, question: string) {
     }
 }
 
-// async function giveExample(question: string) {
-//     try {
-//         const response = await openai.chat.completions.create({
-//             model: 'gpt-3.5-turbo',
-//             messages: [
-//                 {
-//                     role: 'system',
-//                     content: `
-//             You are an expert in assessment and advice for behavioral interviews.
-//             The user will provide you a question delimited with XML tags.
-//             Write a JSON with a 'example' root property with a property for each component of S.T.A.R.
-//           `,
-//                 },
-//                 {
-//                     role: 'user',
-//                     content: `Give me an example of answer based on the S.T.A.R. framework for the <question>${question}</question>`,
-//                 },
-//             ],
-//         });
-//     } catch (error) {
-//         console.error('Error for giving an example', error);
-//         return null;
-//     }
-// }
-
-// // Call the function and log the results
-// // analyzeSTAR("./uploads/audio-1711486536687-183865559.wav", "", trans)
-// //   .then((starElements) => {
-// //     console.log("S.T.A.R. Elements:", starElements);
-// //   })
-// //   .catch((error) => {
-// //     console.error("Error:", error);
-// //   });
-
 app.post('/feedback', upload.single('audio'), async (req, res) => {
-    const { question } = req.body;
+    const { questionId } = req.body;
     const audio = req.file;
 
     try {
-        if (audio) {
-            const starElements = await analyzeSTAR(audio, question);
-            res.json(starElements);
+        const question = await db
+            .collection('questions')
+            .findOne({ _id: new ObjectId(questionId as string) });
+
+        if (audio && question) {
+            const starFeedback = await analyzeSTAR(audio, question.question);
+            const json = {
+                questionId,
+                starFeedback: starFeedback.feedback,
+            };
+            res.json(json);
         }
     } catch (error) {
         console.error('Error giving feedback:', error);
@@ -121,22 +112,104 @@ app.post('/feedback', upload.single('audio'), async (req, res) => {
     }
 });
 
-// app.get('/transcription', async (req, res) => {
-//     try {
-//         const transcription = await openai.audio.transcriptions.create({
-//             file: fs.createReadStream(`./uploads/${audio.filename}`),
-//             model: 'whisper-1',
-//             language: 'en', // this is optional but helps the model
-//         });
+app.get('/questions-categories', async (req, res) => {
+    try {
+        const data = await db
+            .collection('questions-categories')
+            .find({})
+            .toArray();
+        res.send(data);
+    } catch (error) {
+        console.error('Error', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
-//         const transcriptionText = transcription.text;
+app.get('/questions-interview', async (req, res) => {
+    const { categories } = req.query;
 
-//         res.text(transcriptionText);
-//     } catch (error) {
-//         console.error('Error for giving an example', error);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
+    const cats = categories?.length
+        ? ((categories as string) || '').split(',').map((c) => parseInt(c, 10))
+        : '';
+
+    const nbCategories = cats.length;
+    const size = 5;
+    try {
+        const aggregateArray: Document[] = [];
+
+        if (nbCategories) {
+            aggregateArray.push({
+                $match: { categoryId: { $in: cats } },
+            });
+        }
+
+        if (nbCategories > 1) {
+            aggregateArray.push(
+                {
+                    $group: {
+                        _id: '$categoryId',
+                        questions: {
+                            $push: '$$ROOT',
+                        },
+                        count: { $sum: 1 },
+                    },
+                },
+                {
+                    $project: {
+                        questions: {
+                            $slice: [
+                                '$questions',
+                                {
+                                    $min: [
+                                        {
+                                            $subtract: [
+                                                '$count',
+                                                {
+                                                    $ceil: {
+                                                        $divide: [
+                                                            size,
+                                                            nbCategories,
+                                                        ],
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            $floor: {
+                                                $multiply: [
+                                                    { $rand: {} },
+                                                    '$count',
+                                                ],
+                                            },
+                                        },
+                                    ],
+                                },
+                                {
+                                    $ceil: {
+                                        $divide: [size, nbCategories],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+                { $unwind: '$questions' }, // Unwind the sampled documents array
+                { $replaceRoot: { newRoot: '$questions' } } // Replace the root with the sampled documents
+            );
+        }
+
+        aggregateArray.push({ $sample: { size } });
+
+        const data = await db
+            .collection('questions')
+            .aggregate(aggregateArray)
+            .toArray();
+        res.send(data);
+    } catch (error) {
+        console.error('Error', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Start the server
 app.listen(port, () => {

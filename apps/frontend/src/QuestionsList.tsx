@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Button, Typography } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import type { AnswerRecord } from '@behavioral-interview/types';
+import type { AnswerRecord, Question } from '@behavioral-interview/types';
 
 export const QuestionsList = ({
     questions,
@@ -12,7 +12,7 @@ export const QuestionsList = ({
     onSubmit,
 }: {
     visible?: boolean;
-    questions: string[];
+    questions: Question[];
     records: AnswerRecord[];
     onDeleteRecord: (record: AnswerRecord) => void;
     onRecord: (record: AnswerRecord) => void;
@@ -119,7 +119,7 @@ export const QuestionsList = ({
                 <b>
                     {indexQuestion + 1}/{questions.length}
                 </b>{' '}
-                {currentQuestion}
+                {currentQuestion.question}
             </Typography>
 
             {!isRecording && currentRecord && (

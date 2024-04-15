@@ -2,60 +2,46 @@ import { FormEvent, useState } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { InterviewSettings } from './InterviewSettings';
 import { QuestionsList } from './QuestionsList';
-import { shuffle } from 'lodash';
-import questionsJson from './assets/questions.json';
 import { InterviewResult } from './InterviewResult';
-import type { AnswerRecord } from '@behavioral-interview/types';
+import type {
+    AnswerRecord,
+    Question,
+    QuestionsCategories,
+} from '@behavioral-interview/types';
 
 import './App.css';
-
-const questsJson: Record<string, string[]> = questionsJson;
-
-function getQuestions(categories: string[], nbQuestions: number) {
-    const questions: string[] = [];
-    const nbCategories = categories.length;
-
-    if (nbCategories) {
-        const nbOfQuestionsForEachCategory = Math.floor(
-            nbQuestions / nbCategories
-        );
-
-        for (let i = 0; i < nbCategories; i++) {
-            const questionsSet = questsJson[categories[i]];
-            for (let j = 0; j <= nbOfQuestionsForEachCategory; j++) {
-                questions.push(questionsSet[j]);
-            }
-        }
-
-        return shuffle(questions).slice(0, nbQuestions);
-    }
-
-    return shuffle(Object.values(questsJson).flat()).slice(0, nbQuestions);
-}
 
 function App() {
     const [interviewSettingsVisible, setInterviewSettingsVisible] =
         useState(true);
     const [questionsListVisible, setQuestionsListVisible] = useState(false);
     const [interviewResultVisible, setInterviewResultVisible] = useState(false);
-    const [categories, setCategories] = useState<
-        { label: string; value: string }[]
-    >([]);
-    const [questions, setQuestions] = useState<string[]>([]);
+    const [categories, setCategories] = useState<QuestionsCategories[]>([]);
+    const [questions, setQuestions] = useState<Question[]>([]);
     const [records, setRecords] = useState<AnswerRecord[]>([]);
-    const nbQuestions = 5;
 
-    const handleSettingsSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSettingsSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        setQuestionsListVisible(true);
+        await getQuestions();
         setInterviewSettingsVisible(false);
-        setQuestions(
-            getQuestions(
-                categories.map((c) => c.value),
-                nbQuestions
-            )
-        );
+        setQuestionsListVisible(true);
+    };
+
+    const getQuestions = async () => {
+        const cats = categories.map(({ categoryId }) => categoryId);
+        try {
+            // @ts-ignore: Unreachable code error
+            let url = `${__REACT_APP_API_URL__}/questions-interview`;
+            if (cats.length) {
+                url += `?categories=${cats}`;
+            }
+            const response = await fetch(url);
+            const json: any[] = await response.json();
+            setQuestions(json);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleRecord = (record: AnswerRecord) => {
