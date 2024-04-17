@@ -5,7 +5,8 @@
     "main": "app.ts",
     "scripts": {
         "dev": "rm -rf dist && pnpm run build && nodemon src/app.ts",
-        "build": "tsc"
+        "build": "tsc",
+        "vercel-build": "echo hello"
     },
     "dependencies": {
         "body-parser": "^1.20.2",

@@ -11,7 +11,7 @@ import { Db, Document, MongoClient, ObjectId } from 'mongodb';
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = 4000;
 
 app.use(cors());
 
@@ -110,6 +110,10 @@ app.post('/feedback', upload.single('audio'), async (req, res) => {
         console.error('Error giving feedback:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+app.get('/', async (req, res) => {
+    res.send('Hello world!');
 });
 
 app.get('/questions-categories', async (req, res) => {
@@ -215,3 +219,5 @@ app.get('/questions-interview', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+export default app;
