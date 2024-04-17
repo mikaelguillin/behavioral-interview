@@ -6,7 +6,8 @@ import multer from 'multer';
 
 import fs from 'fs';
 import cors from 'cors';
-import { Db, Document, MongoClient, ObjectId } from 'mongodb';
+import { Document, ObjectId } from 'mongodb';
+import { connectToDB, getDB } from './db';
 
 dotenv.config();
 
@@ -20,22 +21,6 @@ app.use(bodyParser.json());
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
-
-const mongoString = process.env.DATABASE_URL || '';
-const client = new MongoClient(mongoString);
-let conn: MongoClient;
-let db: Db;
-
-async function connectDB() {
-    try {
-        conn = await client.connect();
-        db = conn.db('behavioral-interview');
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-connectDB();
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -92,6 +77,7 @@ async function analyzeSTAR(audio: Express.Multer.File, question: string) {
 app.post('/feedback', upload.single('audio'), async (req: any, res: any) => {
     const { questionId } = req.body;
     const audio = req.file;
+    const db = getDB();
 
     try {
         const question = await db
@@ -118,6 +104,7 @@ app.get('/', async (req: any, res: any) => {
 
 app.get('/questions-categories', async (req: any, res: any) => {
     try {
+        const db = getDB();
         const data = await db
             .collection('questions-categories')
             .find({})
@@ -204,6 +191,7 @@ app.get('/questions-interview', async (req: any, res: any) => {
 
         aggregateArray.push({ $sample: { size } });
 
+        const db = getDB();
         const data = await db
             .collection('questions')
             .aggregate(aggregateArray)
@@ -218,6 +206,8 @@ app.get('/questions-interview', async (req: any, res: any) => {
 // Start the server
 app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
+
+    await connectToDB();
 });
 
 export default app;
