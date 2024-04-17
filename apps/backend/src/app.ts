@@ -89,7 +89,7 @@ async function analyzeSTAR(audio: Express.Multer.File, question: string) {
     }
 }
 
-app.post('/feedback', upload.single('audio'), async (req, res) => {
+app.post('/feedback', upload.single('audio'), async (req: any, res: any) => {
     const { questionId } = req.body;
     const audio = req.file;
 
@@ -112,11 +112,11 @@ app.post('/feedback', upload.single('audio'), async (req, res) => {
     }
 });
 
-app.get('/', async (req, res) => {
+app.get('/', async (req: any, res: any) => {
     res.send('Hello world!');
 });
 
-app.get('/questions-categories', async (req, res) => {
+app.get('/questions-categories', async (req: any, res: any) => {
     try {
         const data = await db
             .collection('questions-categories')
@@ -129,7 +129,7 @@ app.get('/questions-categories', async (req, res) => {
     }
 });
 
-app.get('/questions-interview', async (req, res) => {
+app.get('/questions-interview', async (req: any, res: any) => {
     const { categories } = req.query;
 
     const cats = categories?.length
