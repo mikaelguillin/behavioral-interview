@@ -35,8 +35,6 @@ async function connectDB() {
     }
 }
 
-connectDB();
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/');
@@ -216,8 +214,9 @@ app.get('/questions-interview', async (req: any, res: any) => {
 });
 
 // Start the server
-app.listen(port, () => {
+app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
+    await connectDB();
 });
 
 export default app;
