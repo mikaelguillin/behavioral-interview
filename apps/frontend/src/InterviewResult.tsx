@@ -21,6 +21,7 @@ export const InterviewResult = ({
     const [feedbacks, setFeedbacks] = useState<AnswerFeedback[]>([]);
 
     const handleFeedbackClick = async (
+        // @ts-ignore:no-unused-variable
         e: MouseEvent<HTMLButtonElement>,
         { audioBlob, question }: AnswerRecord
     ) => {

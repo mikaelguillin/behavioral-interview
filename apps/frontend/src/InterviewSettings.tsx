@@ -87,6 +87,7 @@ export const InterviewSettings = ({
                         )}
                         style={{ width: 400 }}
                         value={categories}
+                        // @ts-ignore:no-unused-variable
                         onChange={(e, value) => {
                             onCategoriesChange(value);
                             setOptionsLimitReached(value.length >= 5);
