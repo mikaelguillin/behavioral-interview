@@ -9,12 +9,12 @@ export async function connectToDB() {
     try {
         conn = await client.connect();
         db = conn.db('behavioral-interview');
-        return true;
+        return db;
     } catch (e) {
         console.error(e);
     }
 
-    return false;
+    return null;
 }
 
 export function getDB() {

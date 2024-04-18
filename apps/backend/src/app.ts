@@ -7,7 +7,7 @@ import multer from 'multer';
 import fs from 'fs';
 import cors from 'cors';
 import { Document, ObjectId } from 'mongodb';
-import { connectToDB, getDB } from './db';
+import { connectToDB } from './db';
 
 dotenv.config();
 
@@ -77,9 +77,9 @@ async function analyzeSTAR(audio: Express.Multer.File, question: string) {
 app.post('/feedback', upload.single('audio'), async (req: any, res: any) => {
     const { questionId } = req.body;
     const audio = req.file;
-    const db = getDB();
 
     try {
+        const { db } = app.locals;
         const question = await db
             .collection('questions')
             .findOne({ _id: new ObjectId(questionId as string) });
@@ -104,7 +104,7 @@ app.get('/', async (req: any, res: any) => {
 
 app.get('/questions-categories', async (req: any, res: any) => {
     try {
-        const db = getDB();
+        const { db } = app.locals;
         const data = await db
             .collection('questions-categories')
             .find({})
@@ -191,7 +191,7 @@ app.get('/questions-interview', async (req: any, res: any) => {
 
         aggregateArray.push({ $sample: { size } });
 
-        const db = getDB();
+        const { db } = app.locals;
         const data = await db
             .collection('questions')
             .aggregate(aggregateArray)
@@ -207,7 +207,9 @@ app.get('/questions-interview', async (req: any, res: any) => {
 app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
 
-    await connectToDB();
+    const db = await connectToDB();
+
+    app.locals.db = db;
 });
 
 export default app;
