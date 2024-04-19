@@ -7,12 +7,12 @@ import multer from 'multer';
 import fs from 'fs';
 import cors from 'cors';
 import { Document, ObjectId } from 'mongodb';
-import { connectToDB } from './db';
+import connectToDB from './db';
 
 dotenv.config();
 
 const app = express();
-const port = 4000;
+const port = 3000;
 
 app.use(cors());
 
@@ -79,7 +79,12 @@ app.post('/feedback', upload.single('audio'), async (req: any, res: any) => {
     const audio = req.file;
 
     try {
-        const { db } = app.locals;
+        const { mongoClient } = await connectToDB();
+
+        if (!mongoClient)
+            throw new Error('An error occured while connecting to database');
+
+        const db = mongoClient.db('behavioral-interview');
         const question = await db
             .collection('questions')
             .findOne({ _id: new ObjectId(questionId as string) });
@@ -104,7 +109,12 @@ app.get('/', async (req: any, res: any) => {
 
 app.get('/questions-categories', async (req: any, res: any) => {
     try {
-        const { db } = app.locals;
+        const { mongoClient } = await connectToDB();
+
+        if (!mongoClient)
+            throw new Error('An error occured while connecting to database');
+
+        const db = mongoClient.db('behavioral-interview');
         const data = await db
             .collection('questions-categories')
             .find({})
@@ -191,7 +201,12 @@ app.get('/questions-interview', async (req: any, res: any) => {
 
         aggregateArray.push({ $sample: { size } });
 
-        const { db } = app.locals;
+        const { mongoClient } = await connectToDB();
+
+        if (!mongoClient)
+            throw new Error('An error occured while connecting to database');
+
+        const db = mongoClient.db('behavioral-interview');
         const data = await db
             .collection('questions')
             .aggregate(aggregateArray)
@@ -206,10 +221,6 @@ app.get('/questions-interview', async (req: any, res: any) => {
 // Start the server
 app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
-
-    const db = await connectToDB();
-
-    app.locals.db = db;
 });
 
 export default app;
