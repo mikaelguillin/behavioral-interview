@@ -1,13 +1,12 @@
 import dotenv from 'dotenv';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import OpenAI from 'openai';
 import multer from 'multer';
-
-import fs from 'fs';
 import cors from 'cors';
 import { Document, ObjectId } from 'mongodb';
 import connectToDB from './db';
+const { File } = require('@web-std/file');
 
 dotenv.config();
 
@@ -22,23 +21,12 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const fileSuffix = '.wav';
-        cb(null, file.fieldname + '-' + uniqueSuffix + fileSuffix);
-    },
-});
-
-const upload = multer({ storage });
+const upload = multer();
 
 async function analyzeSTAR(audio: Express.Multer.File, question: string) {
     try {
         const transcription = await openai.audio.transcriptions.create({
-            file: fs.createReadStream(`./uploads/${audio.filename}`),
+            file: new File([audio.buffer], 'audio.wav'),
             model: 'whisper-1',
             language: 'en', // this is optional but helps the model
         });
@@ -74,40 +62,45 @@ async function analyzeSTAR(audio: Express.Multer.File, question: string) {
     }
 }
 
-app.post('/feedback', upload.single('audio'), async (req: any, res: any) => {
-    const { questionId } = req.body;
-    const audio = req.file;
+app.post(
+    '/feedback',
+    upload.single('audio'),
+    async (req: Request, res: Response) => {
+        const { questionId } = req.body;
+        const audio = req.file;
 
-    try {
-        const { mongoClient } = await connectToDB();
+        try {
+            const { mongoClient } = await connectToDB();
 
-        if (!mongoClient)
-            throw new Error('An error occured while connecting to database');
+            if (!mongoClient)
+                throw new Error(
+                    'An error occured while connecting to database'
+                );
 
-        const db = mongoClient.db('behavioral-interview');
-        const question = await db
-            .collection('questions')
-            .findOne({ _id: new ObjectId(questionId as string) });
+            const db = mongoClient.db('behavioral-interview');
+            const question = await db
+                .collection('questions')
+                .findOne({ _id: new ObjectId(questionId as string) });
 
-        if (audio && question) {
-            const starFeedback = await analyzeSTAR(audio, question.question);
-            const json = {
-                questionId,
-                starFeedback: starFeedback.feedback,
-            };
-            res.json(json);
+            if (audio && question) {
+                const starFeedback = await analyzeSTAR(
+                    audio,
+                    question.question
+                );
+                const json = {
+                    questionId,
+                    starFeedback: starFeedback.feedback,
+                };
+                res.json(json);
+            }
+        } catch (error) {
+            console.error('Error giving feedback:', error);
+            res.status(500).json({ error: 'Internal server error' });
         }
-    } catch (error) {
-        console.error('Error giving feedback:', error);
-        res.status(500).json({ error: 'Internal server error' });
     }
-});
+);
 
-app.get('/', async (req: any, res: any) => {
-    res.send('Hello world!');
-});
-
-app.get('/questions-categories', async (req: any, res: any) => {
+app.get('/questions-categories', async (req: Request, res: Response) => {
     try {
         const { mongoClient } = await connectToDB();
 
@@ -126,7 +119,7 @@ app.get('/questions-categories', async (req: any, res: any) => {
     }
 });
 
-app.get('/questions-interview', async (req: any, res: any) => {
+app.get('/questions-interview', async (req: Request, res: Response) => {
     const { categories } = req.query;
 
     const cats = categories?.length
