@@ -5,8 +5,8 @@ import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import LoadingButton from '@mui/lab/LoadingButton';
 import type { QuestionsCategories } from '@behavioral-interview/types';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;

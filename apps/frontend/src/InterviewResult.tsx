@@ -1,16 +1,15 @@
 import { MouseEvent, useState } from 'react';
-import {
-    Button,
-    Typography,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    Box,
-} from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Box from '@mui/material/Box';
+
+import LoadingButton from '@mui/lab/LoadingButton';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import type { AnswerRecord, AnswerFeedback } from '@behavioral-interview/types';
-import { Checklist as ChecklistIcon } from '@mui/icons-material';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 export const InterviewResult = ({
     records,
