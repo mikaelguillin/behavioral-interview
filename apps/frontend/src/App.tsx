@@ -19,10 +19,10 @@ function App() {
     const [categories, setCategories] = useState<QuestionsCategories[]>([]);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [records, setRecords] = useState<AnswerRecord[]>([]);
+    const [startLoading, setStartLoading] = useState(false);
 
     const handleSettingsSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         await getQuestions();
         setInterviewSettingsVisible(false);
         setQuestionsListVisible(true);
@@ -31,6 +31,7 @@ function App() {
     const getQuestions = async () => {
         const cats = categories.map(({ categoryId }) => categoryId);
         try {
+            setStartLoading(true);
             // @ts-ignore: Unreachable code error
             let url = `${__REACT_APP_API_URL__}/questions-interview`;
             if (cats.length) {
@@ -39,8 +40,12 @@ function App() {
             const response = await fetch(url);
             const json: any[] = await response.json();
             setQuestions(json);
+            setInterviewSettingsVisible(false);
+            setQuestionsListVisible(true);
         } catch (error) {
             console.error(error);
+        } finally {
+            setStartLoading(false);
         }
     };
 
@@ -68,6 +73,7 @@ function App() {
             <CssBaseline />
             {interviewSettingsVisible && (
                 <InterviewSettings
+                    loading={startLoading}
                     categories={categories}
                     onCategoriesChange={setCategories}
                     onSubmit={handleSettingsSubmit}

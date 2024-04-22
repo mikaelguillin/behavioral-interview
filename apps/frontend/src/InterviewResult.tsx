@@ -7,8 +7,10 @@ import {
     AccordionDetails,
     Box,
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import type { AnswerRecord, AnswerFeedback } from '@behavioral-interview/types';
+import { Checklist as ChecklistIcon } from '@mui/icons-material';
 
 export const InterviewResult = ({
     records,
@@ -19,6 +21,7 @@ export const InterviewResult = ({
     onRestart: () => void;
 }) => {
     const [feedbacks, setFeedbacks] = useState<AnswerFeedback[]>([]);
+    const [feedbackLoading, setFeedbackLoading] = useState<boolean>(false);
 
     const handleFeedbackClick = async (
         // @ts-ignore:no-unused-variable
@@ -26,6 +29,7 @@ export const InterviewResult = ({
         { audioBlob, question }: AnswerRecord
     ) => {
         try {
+            setFeedbackLoading(true);
             const audioFile = new File([audioBlob], 'audio.wav', {
                 type: 'audio/wav',
                 lastModified: Date.now(),
@@ -45,6 +49,8 @@ export const InterviewResult = ({
             setFeedbacks([...feedbacks, json]);
         } catch (error) {
             console.error(error);
+        } finally {
+            setFeedbackLoading(false);
         }
     };
 
@@ -83,16 +89,19 @@ export const InterviewResult = ({
                                         src={record.audioURL}
                                     ></audio>
                                     {!currentFeedback && (
-                                        <Button
+                                        <LoadingButton
                                             type="button"
+                                            loading={feedbackLoading}
+                                            loadingPosition="end"
+                                            endIcon={<ChecklistIcon />}
                                             className="btn-feedback"
-                                            variant="outlined"
+                                            variant="contained"
                                             onClick={(e) =>
                                                 handleFeedbackClick(e, record)
                                             }
                                         >
                                             Get feedback on my answer
-                                        </Button>
+                                        </LoadingButton>
                                     )}
                                 </div>
                                 <Box marginTop={2}>

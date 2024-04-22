@@ -5,17 +5,20 @@ import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import Button from '@mui/material/Button';
+import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
 import type { QuestionsCategories } from '@behavioral-interview/types';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export const InterviewSettings = ({
+    loading = false,
     categories,
     onCategoriesChange,
     onSubmit,
 }: {
+    loading?: boolean;
     visible?: boolean;
     categories: QuestionsCategories[];
     onCategoriesChange: (categories: QuestionsCategories[]) => void;
@@ -105,14 +108,17 @@ export const InterviewSettings = ({
                 </div>
             </div>
 
-            <Button
+            <LoadingButton
                 type="submit"
+                loading={loading}
+                loadingPosition="end"
+                endIcon={<ArrowRightIcon />}
                 className="btn"
                 variant="contained"
                 style={{ marginTop: '40px' }}
             >
                 Start Interview
-            </Button>
+            </LoadingButton>
         </form>
     );
 };
