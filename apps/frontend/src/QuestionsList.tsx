@@ -21,8 +21,8 @@ export const QuestionsList = ({
     const [isRecording, setIsRecording] = useState(false);
     const [indexQuestion, setIndexQuestion] = useState(0);
     const mediaRecorder = useRef<MediaRecorder | null>(null);
-    // const [timer, setTimer] = useState({ minutes: 0, seconds: 0 });
-    // const intervalRef = useRef<number>(0);
+    const [timer, setTimer] = useState({ minutes: 0, seconds: 0 });
+    const intervalRef = useRef<NodeJS.Timeout | string | number | undefined>();
 
     useEffect(() => {
         return () => {
@@ -36,25 +36,30 @@ export const QuestionsList = ({
         };
     }, []);
 
-    // const startTimer = () => {
-    //     intervalRef.current = setInterval(() => {
-    //         setTimer((prevTime) => {
-    //             const newSeconds = prevTime.seconds + 1;
-    //             if (newSeconds === 60) {
-    //                 return { minutes: prevTime.minutes + 1, seconds: 0 };
-    //             }
-    //             return { ...prevTime, seconds: newSeconds };
-    //         });
-    //     }, 1000);
-    // };
+    const startTimer = () => {
+        intervalRef.current = setInterval(() => {
+            setTimer((prevTime) => {
+                const newSeconds = prevTime.seconds + 1;
+                if (newSeconds === 60) {
+                    return { minutes: prevTime.minutes + 1, seconds: 0 };
+                }
+                return { ...prevTime, seconds: newSeconds };
+            });
+        }, 1000);
+    };
 
-    // const stopTimer = () => {
-    //     clearInterval(intervalRef.current);
-    // };
+    const stopTimer = () => {
+        clearInterval(intervalRef.current);
+    };
 
-    // const timerElement = `${timer.minutes
-    //     .toString()
-    //     .padStart(2, '0')}:${timer.seconds.toString().padStart(2, '0')}`;
+    const resetTimer = () => {
+        stopTimer();
+        setTimer({ minutes: 0, seconds: 0 });
+    };
+
+    const timerElement = `${timer.minutes
+        .toString()
+        .padStart(2, '0')}:${timer.seconds.toString().padStart(2, '0')}`;
 
     const currentQuestion = questions[indexQuestion];
     const currentRecord = records[indexQuestion];
@@ -66,8 +71,6 @@ export const QuestionsList = ({
         });
         streamPromise
             .then((stream) => {
-                setIsRecording(true);
-                // startTimer();
                 mediaRecorder.current = new MediaRecorder(stream);
                 mediaRecorder.current.ondataavailable = function (event) {
                     audioChunks.push(event.data);
@@ -83,6 +86,12 @@ export const QuestionsList = ({
                         audioURL,
                     });
                     audioChunks.length = 0;
+                    setIsRecording(false);
+                    stopTimer();
+                };
+                mediaRecorder.current.onstart = function () {
+                    setIsRecording(true);
+                    startTimer();
                 };
                 mediaRecorder.current.start();
             })
@@ -96,9 +105,7 @@ export const QuestionsList = ({
             mediaRecorder.current &&
             mediaRecorder.current.state === 'recording'
         ) {
-            // stopTimer();
             mediaRecorder.current.stop();
-            setIsRecording(false);
         }
     };
 
@@ -108,9 +115,14 @@ export const QuestionsList = ({
             mediaRecorder.current &&
             mediaRecorder.current.state === 'inactive'
         ) {
+            resetTimer();
             mediaRecorder.current.start();
-            setIsRecording(true);
         }
+    };
+
+    const submitAnswer = () => {
+        resetTimer();
+        setIndexQuestion(indexQuestion + 1);
     };
 
     return (
@@ -136,8 +148,7 @@ export const QuestionsList = ({
                     startIcon={<MicIcon />}
                     onClick={stopRecording}
                 >
-                    {/* {timerElement} Stop recording */}
-                    Stop recording
+                    {timerElement} Stop recording
                 </Button>
             ) : currentRecord ? (
                 <>
@@ -175,7 +186,7 @@ export const QuestionsList = ({
                     <Button
                         disabled={isRecording}
                         variant="contained"
-                        onClick={() => setIndexQuestion(indexQuestion + 1)}
+                        onClick={submitAnswer}
                         endIcon={<KeyboardArrowRightIcon />}
                     >
                         Submit answer
