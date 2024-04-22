@@ -60,6 +60,7 @@ function App() {
 
     const handleRestart = () => {
         setRecords([]);
+        setCategories([]);
         setInterviewResultVisible(false);
         setInterviewSettingsVisible(true);
     };
