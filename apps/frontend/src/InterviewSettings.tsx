@@ -8,6 +8,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import LoadingButton from '@mui/lab/LoadingButton';
 import type { QuestionsCategories } from '@behavioral-interview/types';
+import { useTranslation } from 'react-i18next';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -29,6 +30,7 @@ export const InterviewSettings = ({
 
     const [autocompleteOpen, setAutocompleteOpen] = useState<boolean>(false);
     const [options, setOptions] = useState<QuestionsCategories[]>([]);
+    const { t } = useTranslation();
 
     const getOptions = async () => {
         try {
@@ -54,16 +56,15 @@ export const InterviewSettings = ({
             style={{ textAlign: 'center' }}
         >
             <Typography variant="h3" component="h2" marginBottom={5}>
-                Behavioral Interview
+                {t('home.title')}
             </Typography>
 
-            <Typography variant="h5">
-                Practice behavioral interviews and get feedback on your answers
-            </Typography>
+            <Typography variant="h5">{t('home.intro')}</Typography>
             <div className="fields" style={{ marginTop: '20px' }}>
                 <div className="form-row">
                     <label htmlFor="questions-categories">
-                        Choose up to five categories: <small>(optional)</small>
+                        {t('home.field.categories')}{' '}
+                        <small>{t('field.optional')}</small>
                     </label>
 
                     <Autocomplete
@@ -117,7 +118,7 @@ export const InterviewSettings = ({
                 variant="contained"
                 style={{ marginTop: '40px' }}
             >
-                Start Interview
+                {t('home.startinterview')}
             </LoadingButton>
         </form>
     );

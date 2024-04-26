@@ -10,6 +10,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import type { AnswerRecord, AnswerFeedback } from '@behavioral-interview/types';
 import ChecklistIcon from '@mui/icons-material/Checklist';
+import { useTranslation } from 'react-i18next';
 
 export const InterviewResult = ({
     records,
@@ -21,6 +22,7 @@ export const InterviewResult = ({
 }) => {
     const [feedbacks, setFeedbacks] = useState<AnswerFeedback[]>([]);
     const [feedbackLoading, setFeedbackLoading] = useState<boolean>(false);
+    const { t } = useTranslation();
 
     const handleFeedbackClick = async (
         // @ts-ignore:no-unused-variable
@@ -57,7 +59,7 @@ export const InterviewResult = ({
         <>
             <div style={{ textAlign: 'center' }}>
                 <Typography variant="h3" marginBottom={5}>
-                    Interview feedback
+                    {t('result.title')}
                 </Typography>
 
                 {records.map((record, i) => {
@@ -99,7 +101,7 @@ export const InterviewResult = ({
                                                 handleFeedbackClick(e, record)
                                             }
                                         >
-                                            Get feedback on my answer
+                                            {t('result.getfeedback')}
                                         </LoadingButton>
                                     )}
                                 </div>
@@ -126,8 +128,9 @@ export const InterviewResult = ({
                                                         <>
                                                             <Typography>
                                                                 <b>
-                                                                    What you've
-                                                                    done well
+                                                                    {t(
+                                                                        'result.whatyouhavedonewell'
+                                                                    )}
                                                                 </b>
                                                             </Typography>
                                                             <Typography>
@@ -140,8 +143,9 @@ export const InterviewResult = ({
                                                         <>
                                                             <Typography>
                                                                 <b>
-                                                                    What you can
-                                                                    improve
+                                                                    {t(
+                                                                        'result.whatyoucanimprove'
+                                                                    )}
                                                                 </b>
                                                             </Typography>
                                                             <Typography>
@@ -162,7 +166,7 @@ export const InterviewResult = ({
                     variant="contained"
                     style={{ marginTop: '40px' }}
                 >
-                    Start a new interview
+                    {t('result.startnewinterview')}
                 </Button>
             </div>
         </>

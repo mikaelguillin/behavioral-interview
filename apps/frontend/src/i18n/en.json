@@ -1,0 +1,17 @@
+{
+    "field.optional": "(optional)",
+    "home.title": "Behavioral Interview",
+    "home.intro": "Practice behavioral interviews and get feedback on your answers",
+    "home.field.categories": "Choose up to five categories:",
+    "home.startinterview": "Start interview",
+    "interview.stoprecording": "Stop recording",
+    "interview.restartrecording": "Restart recording",
+    "interview.recordanswer": "Record your answer",
+    "interview.submitanswer": "Submit your answer",
+    "interview.submitandgetresults": "Submit and get results",
+    "result.title": "Interview feedback",
+    "result.getfeedback": "Get feedback",
+    "result.whatyouhavedonewell": "What you've done well",
+    "result.whatyoucanimprove": "What you can improve",
+    "result.startnewinterview": "Start a new interview"
+}

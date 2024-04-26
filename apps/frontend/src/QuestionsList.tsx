@@ -3,6 +3,7 @@ import { Button, Typography } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import type { AnswerRecord, Question } from '@behavioral-interview/types';
+import { useTranslation } from 'react-i18next';
 
 export const QuestionsList = ({
     questions,
@@ -23,6 +24,7 @@ export const QuestionsList = ({
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const [timer, setTimer] = useState({ minutes: 0, seconds: 0 });
     const intervalRef = useRef<NodeJS.Timeout | string | number | undefined>();
+    const { t } = useTranslation();
 
     useEffect(() => {
         return () => {
@@ -148,7 +150,7 @@ export const QuestionsList = ({
                     startIcon={<MicIcon />}
                     onClick={stopRecording}
                 >
-                    {timerElement} Stop recording
+                    {timerElement} {t('interview.stoprecording')}
                 </Button>
             ) : currentRecord ? (
                 <>
@@ -158,7 +160,7 @@ export const QuestionsList = ({
                         startIcon={<MicIcon />}
                         onClick={deleteAndRecordAgain}
                     >
-                        Restart recording
+                        {t('interview.restartrecording')}
                     </Button>
                 </>
             ) : (
@@ -168,7 +170,7 @@ export const QuestionsList = ({
                     startIcon={<MicIcon />}
                     onClick={startRecording}
                 >
-                    Record your answer
+                    {t('interview.recordanswer')}
                 </Button>
             )}
 
@@ -180,7 +182,7 @@ export const QuestionsList = ({
                         onClick={onSubmit}
                         endIcon={<KeyboardArrowRightIcon />}
                     >
-                        Submit and get results
+                        {t('interview.submitandgetresults')}
                     </Button>
                 ) : (
                     <Button
@@ -189,7 +191,7 @@ export const QuestionsList = ({
                         onClick={submitAnswer}
                         endIcon={<KeyboardArrowRightIcon />}
                     >
-                        Submit answer
+                        {t('interview.submitanswer')}
                     </Button>
                 ))}
         </div>

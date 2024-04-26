@@ -1,0 +1,17 @@
+{
+    "field.optional": "(optionnel)",
+    "home.title": "Behavioral Interview",
+    "home.intro": "Entraînez-vous aux interviews et obtenez un retour sur vos réponses",
+    "home.field.categories": "Choisissez jusqu'à 5 catégories:",
+    "home.startinterview": "Démarrer l'interview",
+    "interview.stoprecording": "Arrêter l'enregistrement",
+    "interview.restartrecording": "Réenregistrer votre réponse",
+    "interview.recordanswer": "Enregistrer votre réponse",
+    "interview.submitanswer": "Soumettre votre réponse",
+    "interview.submitandgetresults": "Soumettre et voir les résultats",
+    "result.title": "Résultats de l'interview",
+    "result.getfeedback": "Avoir un retour",
+    "result.whatyouhavedonewell": "Ce que vous avez bien réussi",
+    "result.whatyoucanimprove": "Ce que vous pouvez améliorer",
+    "result.startnewinterview": "Démarrer une nouvelle interview"
+}
